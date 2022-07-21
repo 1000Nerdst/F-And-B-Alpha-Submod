@@ -1,28 +1,52 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <template v-if="logged_in">
+      <!-- Side bar -->
+      <!-- <v-navigation-drawer>
+        
+      </v-navigation-drawer> -->
+
+      <!-- Header -->
+      <NavBarAndHeader/>
+      <!-- <AppHeader/>
+      <NavagatorDisplay/> -->
+      
+      <!-- Size content of app based on app components -->
+      <v-main>
+        <router-view></router-view>
+      </v-main>
+    </template>
+    <template v-else>
+      <v-main>
+        <v-container>
+          <LoginAndRegister/>
+        </v-container>
+      </v-main>
+    </template>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+//import AppHeader from "./components/AppHeader.vue";
+//import NavagatorDisplay from "./components/NavagatorDisplay.vue";
+//import HomeScreen from "./components/HomeScreen.vue";
+import NavBarAndHeader from "./components/NavBarAndHeader.vue";
+import LoginAndRegister from "./components/LoginAndRegister.vue"
 
 export default {
   name: 'App',
+
   components: {
-    HelloWorld
-  }
-}
+    //AppHeader,
+    //NavagatorDisplay,
+    //HomeScreen,
+    NavBarAndHeader,
+    LoginAndRegister
+},
+
+  data: () => ({
+    logged_in: false,
+  }),
+};
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
