@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <template v-if="logged_in">
+    <template>
       <!-- Side bar -->
       <!-- <v-navigation-drawer>
         
@@ -16,13 +16,13 @@
         <router-view></router-view>
       </v-main>
     </template>
-    <template v-else>
+    <!-- <template v-else>
       <v-main>
         <v-container>
           <LoginAndRegister/>
         </v-container>
       </v-main>
-    </template>
+    </template> -->
   </v-app>
 </template>
 
@@ -31,17 +31,18 @@
 //import NavagatorDisplay from "./components/NavagatorDisplay.vue";
 //import HomeScreen from "./components/HomeScreen.vue";
 import NavBarAndHeader from "./components/NavBarAndHeader.vue";
-import LoginAndRegister from "./components/LoginAndRegister.vue"
+//import LoginAndRegister from "./components/LoginAndRegister.vue"
 
 export default {
   name: 'App',
+  logged_in: false,
 
   components: {
     //AppHeader,
     //NavagatorDisplay,
     //HomeScreen,
     NavBarAndHeader,
-    LoginAndRegister
+    //LoginAndRegister
 },
 
   data: () => ({

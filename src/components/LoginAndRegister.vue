@@ -32,12 +32,21 @@
                         <v-card-text>
                             <v-text-field
                             label="Email"
+                            name="logEmail"
+                            id="logEmail"
+                            v-model="logEmail"
+                            typeof="email"
+                            required
                             ></v-text-field>
                             <v-text-field
                             label="Password"
                             type="password"
+                            name="logPassword"
+                            id="logPassword"
+                            v-model="logPassword"
                             ></v-text-field>
-                            <v-btn>Login</v-btn>
+                            <v-btn 
+                            @click="loginUser()">Login</v-btn>
                         </v-card-text>
                     </v-window-item>
                     <!-- make the register options -->
@@ -97,14 +106,14 @@
 </template>
 
 <script>
-//import * as firebase from "firebase/app"
-import { createUserWithEmailAndPassword} from "firebase/auth"
-//import db from '@/fb'
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth"
 import auth from '../fb'
-import { collection, doc, setDoc} from 'firebase/firestore'
-//import createUser from '../fb'
-//import db from '../fb'
-import fsdb from '../fb'
+// import { collection, addDoc } from 'firebase/firestore/lite'
+// import { doc, setDoc } from 'firebase/firestore/lite'
+import { doc, setDoc } from 'firebase/firestore'
+import { db as fsdb } from '../fb'
+import { storeUserDataLocal } from '../store/storeUsersInfo'
+import { clearHistory } from '../store/storeUsersInfo'
 
 export default {
 
@@ -115,6 +124,8 @@ export default {
         regPassword:"",
         patreonUsername:"",
         confirmPassword:"",
+        logEmail:"",
+        logPassword: "",
 
         step: 1,
 
@@ -129,31 +140,84 @@ export default {
         }
     },
     methods:{
-        newUser(){
+        async newUser(){  // added async here as we need to add some await's below
             console.log({email: this.regEmail, password: this.regPassword, confirmPassword: this.confirmPassword, username: this.username, patreonUsername: this.patreonUsername})
-            
             try{
-                const user = createUserWithEmailAndPassword(auth, this.regEmail, this.regPassword)
-                console.log(user)
+                await createUserWithEmailAndPassword(auth, this.regEmail, this.regPassword); // need to add await here as this is an async function and we can't proceed until this is done
+
+                // this can only happen if the above worked correctly
+                const cUser = auth.currentUser
+                if (cUser) {
+                    //read and generate users info
+                    const userInfo = {
+                        userEmail: this.regEmail,
+                        username: this.username,
+                        patreonUsername: this.patreonUsername,
+                        staff: false,
+                        investor: false,
+                        uid: cUser.uid // need the user's id not the whole object
+                    }
+                    //generate starting information
+                    const userData = {
+                        activeDaysPerWeek: 0,
+                        age: 25,
+                        calorieTarget: 0,
+                        carbsGrams: 0,
+                        carbsRatio: 45,
+                        fatGrams: 0,
+                        fatRatio: 25,
+                        goal: "Maintence",
+                        heightF: 0,
+                        maintenceTarget: 0,
+                        protienGrams: 0,
+                        proteinRatio: 30,
+                        sex: "Male",
+                        weightLb: 0
+                    }
+
+                    const blankDoc = {
+                        blank: true
+                    }
+                    //make a randomly generated doc ID
+                    // const userInfoCollection = collection(fsdb, 'userInfo'); // first get the collection you want to add to
+                    // await addDoc(userInfoCollection, userInfo);  // now add a document to that collection
+                    //test to see if I can set the get the doc ID to be set to change correctly
+                    await setDoc(doc(fsdb, 'userInfo', cUser.uid), userInfo);
+                    await setDoc(doc(fsdb, 'userData', cUser.uid), userData);
+                    await setDoc(doc(fsdb, 'mealPlans', cUser.uid, 'userMealPlan'), blankDoc);
+                } else {
+                  console.error('no authenticated user');
+                }
             }catch(err){
                 console.log(err)
             }
-            const cUser = auth.currentUser            
-            const userInfo = {
-                userEmail: this.regEmail,
-                username: this.username,
-                patreonUsername: this.patreonUsername,
-                staff: false,
-                investor: false,
-                uid: cUser
-            }
-
-            const newUserRef = doc(collection(fsdb, 'userInfo'))
-
-            const docRef = setDoc(newUserRef, userInfo);
-            console.log(docRef)
-            //createUser(userInfo)
-            // db.collection('userInfo').doc(cUser).add(userInfo).then(() => console.log('added to database'))
+        },
+        async loginUser(){
+            console.log({email: this.logEmail, password: this.logPassword})
+            const auth = getAuth();
+            signInWithEmailAndPassword(auth, this.logEmail, this.logPassword)
+            .then((userCredential) => {
+                // Signed in 
+                //clear the previous history
+                console.log('trying to clear history');
+                clearHistory();
+                const user = userCredential.user;
+                console.log({uid: user.uid});
+                storeUserDataLocal(user.uid);
+                console.log('after new stored data');
+                console.log(console.log(sessionStorage.getItem('activeDaysPerWeek')));
+                //set the user name as well as any other information that needs to be moved
+                // ...
+                // let redirect_url = this.$router.query.redirect || '/'
+                const redirectionPath =sessionStorage.getItem('redirectPath');
+                this.$router.push(redirectionPath);
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode);
+                console.log(errorMessage);
+            });
         },
         onSignup (){
             console.log({email: this.email, password: this.password, confirmPassword: this, username: this.username, patreonUsername: this.patreonUsername})

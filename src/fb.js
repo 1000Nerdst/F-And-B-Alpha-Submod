@@ -1,8 +1,6 @@
-//import * as firebase from 'firebase/app'
-import { initializeApp } from "firebase/app";
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 import { getAuth } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import 'firebase/database'
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_m-Cntfs1VUOFzCg_scngg2eelbcPGPY",
@@ -15,24 +13,28 @@ const firebaseConfig = {
   measurementId: "G-9RN5GKJDRR"
 };
 
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
 const auth = getAuth(app);
+export default auth
+
 
 // const db = firebase.Firestore();
 // db.settings({timestampInSnapshots: true});
 
-export const db = initializeApp(firebaseConfig).firestore
+// export const db = initializeApp(firebaseConfig).firestore
+// export const fsdb = getFirestore()
 
-export const createUser = userInfo =>{
-  const cUser = userInfo.uid
-  const docRef = setDoc(doc(db, 'userInfo', cUser), userInfo);
-  return docRef
-}
+// export const createUser = userInfo =>{
+//   const cUser = userInfo.uid
+//   const docRef = setDoc(doc(db, 'userInfo', cUser), userInfo);
+//   return docRef
+// }
 
-//make an update fuctions
+// //make an update fuctions
 
-//make a delete function
+// //make a delete function
 
-//make a load users hook
+// //make a load users hook
 
-export default auth
+// export default auth

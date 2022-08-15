@@ -6,41 +6,26 @@ import MealPlanView from '../components/MealPlans.vue'
 import RecipesView from '../components/RecipeDisplay.vue'
 import GroceryListView from '../components/GroceryList.vue'
 import LoginAndRegister from '../components/LoginAndRegister.vue'
+import dbBaseAdmin from '../components/DataBaseAdmin.vue'
+//import store from '../store/store'
 //import { component } from 'vue/types/umd'
+import auth from '../fb'
+import VueSessionStorage from 'vue-sessionstorage'
+// import { doc, getDoc } from "firebase/firestore"; 
+// import { db as fsdb } from '../fb'
 
 Vue.use(VueRouter)
+Vue.use(VueSessionStorage)
 
+//auth: false -> meta: { auth: true } in the future
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: DashboardView
-  },
-  {
-    path: '/settings',
-    name: 'settings',
-    component: SettingsView
-  },
-  {
-    path: '/meal_plans',
-    name: 'mealPlans',
-    component: MealPlanView
-  },
-  {
-    path: '/recipes',
-    name: 'recipes',
-    component: RecipesView
-  },
-  {
-    path: '/grocery_list',
-    name: 'groceryList',
-    component: GroceryListView
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginAndRegister
-  }
+  { path: '/', name: 'home', component: DashboardView, meta: { auth: true } },
+  { path: '/settings', name: 'settings', component: SettingsView, meta: { auth: true } },
+  { path: '/meal_plans', name: 'mealPlans', component: MealPlanView, meta: { auth: true } },
+  { path: '/recipes', name: 'recipes', component: RecipesView, meta: { auth: true } },
+  { path: '/grocery_list', name: 'groceryList', component: GroceryListView, meta: { auth: true } },
+  { path: '/login', name: 'login', component: LoginAndRegister, meta: { auth: false } }, //make sure to add an admin fuction
+  { path: '/admin', name: 'admin', component: dbBaseAdmin, meta: { auth: true, admin:true } }
 ]
 
 const router = new VueRouter({
@@ -48,5 +33,44 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+router.beforeEach((to, from, next) => {
+  const currentUser = auth.currentUser;
+  //var uid = currentUser.uid;
+  //go into firestore and open the currentUser by udit and see if they are admin
+  
+  const isAdmin = sessionStorage.getItem('isAdmin');
+  console.log('is admin:', isAdmin);
+  if(to.meta.auth && !currentUser){
+    sessionStorage.setItem('redirectPath', to.path);
+    console.log('is admin: not logged in');
+    next('/login');
+  }else if(to.meta.admin === true && isAdmin === false){
+    sessionStorage.setItem('redirectPath', to.path);
+    console.log('is admin: not admin');
+    next('/login');
+  }else if(!to.meta.auth && currentUser && !to.meta.admin){
+    console.log('is admin: no admin req');
+    next();
+  }
+  else if(to.meta.auth === true && currentUser && to.meta.admin && isAdmin === true){
+    console.log('admin loggin');
+    next();
+  }else{
+    console.log('is admin: else');
+    next();
+  }
+  //console.log(store)
+  // const publicPages = ['/login'];
+  // const requiredAuth = !publicPages.includes(to.path);
+  // const currentUser = auth.currentUser;
 
+  // if(requiredAuth && !currentUser){
+  //   sessionStorage.setItem('redirectPath', to.path)
+  //   return next('/login');
+  // }else if(requiredAuth && currentUser){
+  //   next();
+  // }else{
+  //   next();
+  // }
+})
 export default router
