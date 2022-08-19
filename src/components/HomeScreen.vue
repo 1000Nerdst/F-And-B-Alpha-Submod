@@ -1,5 +1,6 @@
 <template>
     <v-container>
+         <!-- <NavBarAndHeader/> -->
         <!-- Divide the screen into two rows -->
         <v-row>
             <!-- This first row will be divied into two colombs -->
@@ -149,18 +150,18 @@
                     >
                         <v-card-text>
                             <v-sheet color="grey lighter-2">
-                                <v-sparkline
+                                <!-- <v-sparkline
                                 :value="weights"
                                 color="white"
                                 smooth>
                                     <template v-slot: label="weight">
                                         ${{ weight.weights}}
                                     </template>
-                                </v-sparkline>
+                                </v-sparkline> -->
                             </v-sheet>
                         </v-card-text>
                         <v-card-text>
-                            <div>User Progress</div>
+                            <div>User Progress Coming Soon</div>
                         </v-card-text>
                         <v-card-actions>
                             <v-btn

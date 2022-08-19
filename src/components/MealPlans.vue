@@ -1,14 +1,14 @@
 <template>
     <v-container>
         <!-- make two rows -->
-        <v-row>
+        <v-row >
             <!-- this row will contain meals and verified totals -->
             <v-col>
                 <!-- this col will cotain daily planned meals -->
                 <!-- make two rows -->
                 <v-card
-                width="auto">
-                    <v-row>
+               >
+                    <v-row style="margin: 0px;">
                     <!-- this row will contain a date picker and button changer -->
                         <v-menu
                         ref="menu"
@@ -53,7 +53,7 @@
                             </v-date-picker>
                         </v-menu>
                     </v-row>
-                    <v-row>
+                    <v-row style="margin: 0px;">
                         <!-- this row will display the meal with a check box attached -->
                         <v-expansion-panels
                         v-model="panel"
@@ -87,8 +87,8 @@
                     </v-row>
                 </v-card>
             </v-col>
-            <v-col>
-                <!-- this col will cotain verified totals -->
+            <!-- <v-col>
+              
                 <v-sheet>
                     <template>
                             <v-container fluid>
@@ -135,9 +135,9 @@
                             </v-container>
                         </template>
                 </v-sheet>
-            </v-col>
+            </v-col> -->
         </v-row>
-        <v-row>
+        <v-row style="margin: 20px 0px;">
             <!-- this row will contain  planned totals-->
             <v-card
             width="100%">
